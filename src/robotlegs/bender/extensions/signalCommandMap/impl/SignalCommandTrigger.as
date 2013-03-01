@@ -104,17 +104,20 @@ public class SignalCommandTrigger implements ICommandTrigger
         {
             mapSignalValues(signal.valueClasses, valueObjects);
 
-            if (guardsApprove(mapping.guards, _injector))
+            const isApproved:Boolean = guardsApprove(mapping.guards, _injector);
+            if (isApproved)
             {
                 _once && removeMapping(mapping);
                 _injector.map(mapping.commandClass).asSingleton();
                 const command:Object = _injector.getInstance( mapping.commandClass);
                 applyHooks(mapping.hooks, _injector);
                 _injector.unmap(mapping.commandClass);
-                command.execute();
             }
 
-            unmapSignalValues(signal.valueClasses, valueObjects);
+            unmapSignalValues( signal.valueClasses, valueObjects );
+
+            if (isApproved)
+                command.execute();
         }
 
         if ( _once )
